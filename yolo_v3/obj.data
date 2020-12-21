@@ -1,0 +1,1 @@
+classes= 2'\n'train =/home/devesh/Projects/Driver_Distraction_System/darkent/data/train.txt'\n'valid =/home/devesh/Projects/Driver_Distraction_System/darkent/data/test.txt'\n'names =/home/devesh/Projects/Driver_Distraction_System/darkent/cfg/obj.names'\n'backup = backup
