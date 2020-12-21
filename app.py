@@ -6,7 +6,7 @@ import cv2
 import os
 from flask import Flask, request, Response, jsonify
 import jsonpickle
-#import binascii
+import base64
 import io as StringIO
 import base64
 from io import BytesIO
@@ -52,7 +52,7 @@ def load_model(configpath,weightspath):
 def image_to_byte_array(image:Image):
   imgByteArr = io.BytesIO()
   image.save(imgByteArr, format='PNG')
-  imgByteArr = imgByteArr.getvalue()
+  imgByteArr = base64.encodebytes(imgByteArr.getvalue()).decode('ascii')
   return imgByteArr
 
 
@@ -162,8 +162,8 @@ def hello():
 def main():
     # load our input image and grab its spatial dimensions
     #image = cv2.imread("./test1.jpg")
-    img = request.files["image"].read()
-    img = Image.open(io.BytesIO(img))
+    img = request.json["image"]
+    img = Image.open(io.BytesIO(base64.b64decode(img)))
     npimg=np.array(img)
     image=npimg.copy()
     image=cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
@@ -175,7 +175,8 @@ def main():
     image=cv2.cvtColor(res,cv2.COLOR_BGR2RGB)
     np_img=Image.fromarray(image)
     img_encoded=image_to_byte_array(np_img)
-    return Response(response=img_encoded, status=200,mimetype="image/jpeg")
+    return jsonify({"image" : img_encoded})
+    # return Response(response=img_encoded, status=200,mimetype="image/jpeg")
 
     # start flask app
 if __name__ == '__main__':
