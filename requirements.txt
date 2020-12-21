@@ -7,7 +7,7 @@ Jinja2==2.11.2
 jsonpickle==1.4.2
 MarkupSafe==1.1.1
 numpy==1.19.3
-opencv-python==4.4.0.46
+opencv-contrib-python-headless==4.4.0.46
 Pillow==8.0.1
 typing-extensions==3.7.4.3
 Werkzeug==1.0.1
