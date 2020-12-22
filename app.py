@@ -13,6 +13,7 @@ from io import BytesIO
 import io
 import json
 from PIL import Image
+import matplotlib.pyplot as plt
 
 # construct the argument parse and parse the arguments
 
@@ -49,11 +50,24 @@ def load_model(configpath,weightspath):
     return net
 
 
+# def image_to_byte_array(image:Image):
+#     imgByteArr = io.BytesIO()
+#     image.save(imgByteArr, format='PNG')
+#     imgByteArr = base64.encodebytes(imgByteArr.getvalue()).decode('ascii')
+#     return imgByteArr
+
 def image_to_byte_array(image:Image):
-  imgByteArr = io.BytesIO()
-  image.save(imgByteArr, format='PNG')
-  imgByteArr = base64.encodebytes(imgByteArr.getvalue()).decode('ascii')
-  return imgByteArr
+    imgByteArr = io.BytesIO()
+    image.save(imgByteArr, format='PNG')
+    imgByteArr = imgByteArr.getvalue()
+    return imgByteArr
+
+def get_response_image(image_path):
+    pil_img = Image.open(image_path, mode='r') # reads the PIL image
+    byte_arr = io.BytesIO()
+    pil_img.save(byte_arr, format='PNG') # convert the PIL image to byte array
+    encoded_img = base64.encodebytes(byte_arr.getvalue()).decode('ascii') # encode as base64
+    return encoded_img
 
 
 def get_predection(image,net,LABELS,COLORS):
@@ -168,14 +182,16 @@ def main():
     image=npimg.copy()
     image=cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
     res=get_predection(image,nets,Lables,Colors)
-    # image=cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+    image=cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
     # show the output image
-    #cv2.imshow("Image", res)
-    #cv2.waitKey()
-    image=cv2.cvtColor(res,cv2.COLOR_BGR2RGB)
+    # plt.imshow(res, cmap = 'gray', interpolation = 'bicubic')
+    # plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+    # plt.show()
     np_img=Image.fromarray(image)
-    img_encoded=image_to_byte_array(np_img)
-    return jsonify({"image" : img_encoded})
+    np_img.save("TEST.png")
+    encoded_img = get_response_image("TEST.png")
+    response =  { 'Status' : 'Success', 'message': 'Class Detected to be shown here.' , 'image': encoded_img}
+    return jsonify(response)
     # return Response(response=img_encoded, status=200,mimetype="image/jpeg")
 
     # start flask app
