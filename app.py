@@ -13,7 +13,7 @@ from io import BytesIO
 import io
 import json
 from PIL import Image
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 # construct the argument parse and parse the arguments
 
