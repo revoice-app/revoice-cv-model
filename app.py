@@ -138,6 +138,8 @@ def get_predection(image,net,LABELS,COLORS):
 
     # print("IDXS {}".format(idxs))
     # ensure at least one detection exists
+    predicted_class = ''
+    predicted_class_confidence = 0
     if len(idxs) > 0:
         # loop over the indexes we are keeping
         for i in idxs.flatten():
@@ -149,10 +151,13 @@ def get_predection(image,net,LABELS,COLORS):
             color = [int(c) for c in COLORS[classIDs[i]]]
             cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
             text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
+            predicted_class = LABELS[classIDs[i]]
+            predicted_class_confidence = round(confidences[i], 4)
+            # print(text)
             # print(boxes)
             # print("CLASS IDS {}".format(classIDs))
             cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,0.5, color, 2)
-    return image
+    return image, predicted_class, predicted_class_confidence 
 
 
 labelsPath="yolo_v3/obj.names"
@@ -181,7 +186,7 @@ def main():
     npimg=np.array(img)
     image=npimg.copy()
     image=cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
-    res=get_predection(image,nets,Lables,Colors)
+    res, predict_class, confidence =get_predection(image,nets,Lables,Colors)
     image=cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
     # show the output image
     # plt.imshow(res, cmap = 'gray', interpolation = 'bicubic')
@@ -190,7 +195,7 @@ def main():
     np_img=Image.fromarray(image)
     np_img.save("TEST.png")
     encoded_img = get_response_image("TEST.png")
-    response =  { 'Status' : 'Success', 'message': 'Class Detected to be shown here.' , 'image': encoded_img}
+    response =  { 'Status' : 'Success', 'class_text': predict_class , "class_confidence": confidence, 'image': encoded_img}
     return jsonify(response)
     # return Response(response=img_encoded, status=200,mimetype="image/jpeg")
 
